@@ -8,6 +8,7 @@ scnterm 是基于 [WezTerm](https://github.com/wezterm/wezterm) 的个人维护�
 
 - [开发与维护步骤](docs/README.md)：项目约定、功能开发、上游同步和发布流程。
 - [Linux 开发环境](docs/development-environment.md)：依赖安装、构建命令、独立启动与测试结果。
+- [自动构建与发布](docs/continuous-release.md)：发布平台、兼容性检查和 自动更新方式。
 - [个人终端配置](https://github.com/scnabla/personal-config)：通过 Lua 配置实现的个人设置。
 - [WezTerm 官方文档](https://wezterm.org/)：已有终端功能、Lua 配置和命令行使用说明。
 
@@ -20,7 +21,9 @@ scnterm 是基于 [WezTerm](https://github.com/wezterm/wezterm) 的个人维护�
 
 功能开发从 `personal` 创建 `feature/<功能名>`，上游更新验证使用 `update/<日期>`，验证通过后合入 `personal`。
 
-仓库保留从上游继承的版本标签，包括 `nightly`。这些标签用于定位上游历史提交，不代表 scnterm 已发布对应安装包。
+向 `personal` 推送提交后，自动编译并测试 Windows、Ubuntu 22.04、Ubuntu 24.04、Ubuntu 26.04 和 macOS。全部通过后，Windows、Ubuntu 26.04 与 macOS 安装包更新到同一个 [Release](https://github.com/scnabla/scnterm/releases/tag/latest)。
+
+`latest` 标签用于 scnterm 的持续发布；其他上游历史标签保留用于定位原始版本。
 
 ## Linux 构建
 

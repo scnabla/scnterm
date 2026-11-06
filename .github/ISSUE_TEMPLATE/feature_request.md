@@ -1,20 +1,19 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: 功能建议
+about: 提出 scnterm 的功能或配置改进建议
 title: ''
-labels: [enhancement, needs:triage]
+labels: []
 assignees: ''
-
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## 使用场景
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+描述具体操作和当前遇到的问题。
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## 期望行为
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+描述期望的操作方式与结果。
+
+## 已尝试的配置或方法
+
+列出相关配置、替代方法及其局限。

@@ -1,16 +1,15 @@
 ---
-name: Documentation Problem
-about: Missing, incomplete or incorrect information in the documentation
+name: 文档问题
+about: 报告 scnterm 文档中的错误或缺漏
 title: ''
-labels: ["T: docs", needs:triage]
+labels: []
 assignees: ''
-
 ---
 
-**What page or section of the docs have an issue?**
-Please include a link
+## 文档位置
 
-**Describe the issue**
-A clear and concise description of what you were looking for, couldn't find, or
-the where things were misleading etc.
+提供文件路径、章节或页面链接。
 
+## 问题描述
+
+说明错误、缺失或不清晰的内容，以及实际操作结果。

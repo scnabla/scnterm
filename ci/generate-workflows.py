@@ -1172,7 +1172,8 @@ def remove_gen_actions():
         os.remove(name)
 
 
-remove_gen_actions()
-generate_pr_actions()
-continuous_actions()
-tag_actions()
+if __name__ == "__main__":
+    remove_gen_actions()
+    generate_pr_actions()
+    continuous_actions()
+    tag_actions()
