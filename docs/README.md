@@ -9,12 +9,14 @@
 | 本地项目目录 | `/home/scnable/work/scnablaTerm` |
 | GitHub 账户 | `scnabla` |
 | 仓库暂定名称 | `scnterm` |
-| 计划中的仓库地址 | `https://github.com/scnabla/scnterm` |
+| 仓库地址 | `https://github.com/scnabla/scnterm` |
 | 官方上游 | `https://github.com/wezterm/wezterm` |
 | Git 提交邮箱 | `46028051+scnabla@users.noreply.github.com` |
 | 个人终端配置仓库 | `https://github.com/scnabla/personal-config` |
 
 仓库名称与本地目录名称分别管理，保留当前 `scnablaTerm` 目录。后续更名时单独更新远程地址、文档和构建发布引用；应用显示名称、可执行文件名称及安装包名称另行安排。
+
+Linux 构建环境、命令及验证记录见 [开发环境](development-environment.md)。
 
 ## 第一阶段 搭建开发环境
 
