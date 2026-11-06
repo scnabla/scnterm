@@ -823,7 +823,7 @@ impl TermWindow {
 
         let window = Window::new_window(
             &get_window_class(),
-            "wezterm",
+            "scnterm",
             geometry,
             Some(&config),
             Rc::clone(&fontconfig),

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 ; vim:ts=2:sw=2:et:
 
-#define MyAppName "WezTerm"
+#define MyAppName "scnterm"
 ;#define MyAppVersion "1.5"
 #define MyAppPublisher "Wez Furlong"
 #define MyAppURL "http://wezterm.org"
@@ -19,7 +19,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\{#MyAppName}
+DefaultDirName={autopf}\WezTerm
 DisableProgramGroupPage=yes
 ;LicenseFile=..\LICENSE.md
 ; Remove the following line to run in administrative install mode (install for all users.)
@@ -62,13 +62,13 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Registry]
-Root: HKA; Subkey: "Software\Classes\Drive\shell\Open WezTerm here"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\Drive\shell\Open WezTerm here"; ValueType: string; ValueData: "Open scnterm here"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\Drive\shell\Open WezTerm here"; ValueName: "icon"; ValueType: string; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey;
 Root: HKA; Subkey: "Software\Classes\Drive\shell\Open WezTerm here\command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" start --no-auto-connect --cwd ""%V\"""; Flags: uninsdeletekey;
-Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\Open WezTerm here"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\Open WezTerm here"; ValueType: string; ValueData: "Open scnterm here"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\Open WezTerm here"; ValueName: "icon"; ValueType: string; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey;
 Root: HKA; Subkey: "Software\Classes\Directory\Background\shell\Open WezTerm here\command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" start --no-auto-connect --cwd ""%V"; Flags: uninsdeletekey;
-Root: HKA; Subkey: "Software\Classes\Directory\shell\Open WezTerm here"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\Directory\shell\Open WezTerm here"; ValueType: string; ValueData: "Open scnterm here"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\Directory\shell\Open WezTerm here"; ValueName: "icon"; ValueType: string; ValueData: "{app}\{#MyAppExeName}"; Flags: uninsdeletekey;
 Root: HKA; Subkey: "Software\Classes\Directory\shell\Open WezTerm here\command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" start --no-auto-connect --cwd ""%V\\"""; Flags: uninsdeletekey;
 

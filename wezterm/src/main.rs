@@ -23,7 +23,9 @@ mod cli;
 
 #[derive(Debug, Parser)]
 #[command(
-    about = "Wez's Terminal Emulator\nhttp://github.com/wezterm/wezterm",
+    name = "scnterm",
+    bin_name = "wezterm",
+    about = "scnterm — 基于 WezTerm 的终端模拟器\nhttps://github.com/scnabla/scnterm",
     version = wezterm_version()
 )]
 pub struct Opt {
