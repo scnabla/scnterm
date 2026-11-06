@@ -32,7 +32,7 @@ fn run_confirmation_impl(message: &str, term: &mut TermWizTerminal) -> anyhow::R
     let top_row = (size.rows - (message_rows + 2)) / 2;
 
     let button_row = top_row + message_rows + 1;
-    let mut active = ActiveButton::None;
+    let mut active = ActiveButton::No;
 
     let yes_x = x_pos;
     let yes_w = 7;
@@ -42,7 +42,6 @@ fn run_confirmation_impl(message: &str, term: &mut TermWizTerminal) -> anyhow::R
 
     #[derive(Copy, Clone, PartialEq, Eq)]
     enum ActiveButton {
-        None,
         Yes,
         No,
     }
@@ -94,6 +93,24 @@ fn run_confirmation_impl(message: &str, term: &mut TermWizTerminal) -> anyhow::R
     while let Ok(Some(event)) = term.poll_input(None) {
         match event {
             InputEvent::Key(KeyEvent {
+                key: KeyCode::LeftArrow,
+                ..
+            }) => {
+                active = ActiveButton::Yes;
+            }
+            InputEvent::Key(KeyEvent {
+                key: KeyCode::RightArrow,
+                ..
+            }) => {
+                active = ActiveButton::No;
+            }
+            InputEvent::Key(KeyEvent {
+                key: KeyCode::Enter,
+                ..
+            }) => {
+                return Ok(active == ActiveButton::Yes);
+            }
+            InputEvent::Key(KeyEvent {
                 key: KeyCode::Char('y' | 'Y'),
                 ..
             }) => {
@@ -127,8 +144,6 @@ fn run_confirmation_impl(message: &str, term: &mut TermWizTerminal) -> anyhow::R
                     if mouse_buttons == MouseButtons::LEFT {
                         return Ok(false);
                     }
-                } else {
-                    active = ActiveButton::None;
                 }
 
                 if mouse_buttons != MouseButtons::NONE {
