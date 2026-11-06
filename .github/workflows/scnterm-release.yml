@@ -312,7 +312,7 @@ jobs:
     if: github.repository == 'scnabla/scnterm' && github.ref == 'refs/heads/personal'
     name: macos
     needs: validate
-    runs-on: "macos-latest"
+    runs-on: "macos-15-intel"
     timeout-minutes: 120
     env:
       BUILD_REASON: "Schedule"

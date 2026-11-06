@@ -26,6 +26,9 @@ def build_job(target, publish):
         )
     target.global_env()
     job.env['CARGO_BUILD_JOBS'] = '3'
+    if target.name == 'macos':
+        # 使用 Intel 标准构建机器直接运行 x86_64 测试，仍编译双架构通用包。
+        job.runs_on = 'macos-15-intel'
     # 容器内无需挂载 FUSE 即可执行 linuxdeploy。
     if target.app_image:
         job.env['APPIMAGE_EXTRACT_AND_RUN'] = '1'

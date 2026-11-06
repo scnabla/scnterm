@@ -14,6 +14,8 @@
 
 各平台复用 `ci/generate-workflows.py` 中的上游构建步骤。五个平台全部成功后，发布任务收集 Windows、Ubuntu 26.04 与 macOS 的产物。
 
+macOS 任务使用 GitHub 的 `macos-15-intel` 标准构建机器，编译 Intel 和 Apple Silicon 两个目标并生成通用包，自动测试在 Intel 目标上运行。
+
 编译检查验证平台代码能否编译、链接，自动测试验证已有测试覆盖的功能。窗口显示、输入法、字体和快捷键等桌面行为需要对应系统的实机验证。
 
 ## 固定下载入口
