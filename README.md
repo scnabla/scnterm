@@ -2,13 +2,14 @@
 
 scnterm 是基于 [WezTerm](https://github.com/wezterm/wezterm) 的个人维护分支，由 [scnabla](https://github.com/scnabla) 维护，按日常使用需求开发终端功能，并持续接收上游更新。个人偏好通过配置控制。
 
-项目已完成 Linux x86_64 的首次构建和基础运行验证。当前功能源码与官方基准提交 `e68a8ec27727fbbda15e07f0a0737cd5e16481f6` 一致，构建与测试结果见 [开发环境](docs/development-environment.md)。
+项目基于官方提交 `e68a8ec27727fbbda15e07f0a0737cd5e16481f6` 开发，已完成 Linux x86_64 构建和基础运行验证。应用原有名称显示位置使用 `scnterm`；关闭确认框支持左右方向键选择、Enter 确认，默认选中“否”，保留 Y、N、Esc 和鼠标操作。首次构建与测试结果见 [开发环境](docs/development-environment.md)。
 
 ## 项目文档
 
 - [开发与维护步骤](docs/README.md)：项目约定、功能开发、上游同步和发布流程。
 - [Linux 开发环境](docs/development-environment.md)：依赖安装、构建命令、独立启动与测试结果。
-- [自动构建与发布](docs/continuous-release.md)：发布平台、兼容性检查和 自动更新方式。
+- [自动构建与发布](docs/continuous-release.md)：发布平台、兼容性检查和自动更新方式。
+- [待修复问题](docs/known-issues.md)：已记录的缺陷、排查方向和验收要求。
 - [个人终端配置](https://github.com/scnabla/personal-config)：通过 Lua 配置实现的个人设置。
 - [WezTerm 官方文档](https://wezterm.org/)：已有终端功能、Lua 配置和命令行使用说明。
 
