@@ -159,7 +159,7 @@
               ''
               + lib.optionalString stdenv.isDarwin /* bash */ ''
                 mkdir -p "$out/Applications"
-                OUT_APP="$out/Applications/WezTerm.app"
+                OUT_APP="$out/Applications/scnterm.app"
                 cp -r assets/macos/WezTerm.app "$OUT_APP"
                 rm $OUT_APP/*.dylib
                 cp -r assets/shell-integration/* "$OUT_APP/Contents/Resources"

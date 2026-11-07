@@ -20,7 +20,7 @@ echo "OSTYPE is $OSTYPE"
 
 case $OSTYPE in
   darwin*)
-    zipdir=WezTerm-macos-$TAG_NAME
+    zipdir=scnterm-macos-$TAG_NAME
     if [[ "$BUILD_REASON" == "Schedule" ]] ; then
       zipname=WezTerm-macos-nightly.zip
     else
@@ -28,28 +28,28 @@ case $OSTYPE in
     fi
     rm -rf $zipdir $zipname
     mkdir $zipdir
-    cp -r assets/macos/WezTerm.app $zipdir/
+    cp -r assets/macos/WezTerm.app $zipdir/scnterm.app
     # Omit MetalANGLE for now; it's a bit laggy compared to CGL,
     # and on M1/Big Sur, CGL is implemented in terms of Metal anyway
-    rm $zipdir/WezTerm.app/*.dylib
-    mkdir -p $zipdir/WezTerm.app/Contents/MacOS
-    mkdir -p $zipdir/WezTerm.app/Contents/Resources
-    cp -r assets/shell-integration/* $zipdir/WezTerm.app/Contents/Resources
-    cp -r assets/shell-completion $zipdir/WezTerm.app/Contents/Resources
-    tic -xe wezterm -o $zipdir/WezTerm.app/Contents/Resources/terminfo termwiz/data/wezterm.terminfo
+    rm $zipdir/scnterm.app/*.dylib
+    mkdir -p $zipdir/scnterm.app/Contents/MacOS
+    mkdir -p $zipdir/scnterm.app/Contents/Resources
+    cp -r assets/shell-integration/* $zipdir/scnterm.app/Contents/Resources
+    cp -r assets/shell-completion $zipdir/scnterm.app/Contents/Resources
+    tic -xe wezterm -o $zipdir/scnterm.app/Contents/Resources/terminfo termwiz/data/wezterm.terminfo
 
     for bin in wezterm wezterm-mux-server wezterm-gui strip-ansi-escapes ; do
       # If the user ran a simple `cargo build --release`, then we want to allow
       # a single-arch package to be built
       if [[ -f $TARGET_DIR/release/$bin ]] ; then
-        cp $TARGET_DIR/release/$bin $zipdir/WezTerm.app/Contents/MacOS/$bin
+        cp $TARGET_DIR/release/$bin $zipdir/scnterm.app/Contents/MacOS/$bin
       else
         # The CI runs `cargo build --target XXX --release` which means that
         # the binaries will be deployed in `$TARGET_DIR/XXX/release` instead of
         # the plain path above.
         # In that situation, we have two architectures to assemble into a
         # Universal ("fat") binary, so we use the `lipo` tool for that.
-        lipo $TARGET_DIR/*/release/$bin -output $zipdir/WezTerm.app/Contents/MacOS/$bin -create
+        lipo $TARGET_DIR/*/release/$bin -output $zipdir/scnterm.app/Contents/MacOS/$bin -create
       fi
     done
 
@@ -80,7 +80,7 @@ case $OSTYPE in
       security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_PW" build.keychain
       echo "Codesign"
       /usr/bin/codesign --keychain build.keychain --force --options runtime \
-        --entitlements ci/macos-entitlement.plist --deep --sign "$MACOS_TEAM_ID" $zipdir/WezTerm.app/
+        --entitlements ci/macos-entitlement.plist --deep --sign "$MACOS_TEAM_ID" $zipdir/scnterm.app/
       echo "Restore default keychain"
       security default-keychain -d user -s $def_keychain
       echo "Remove build.keychain"
@@ -102,7 +102,7 @@ case $OSTYPE in
 
     ;;
   msys|cygwin)
-    zipdir=WezTerm-windows-$TAG_NAME
+    zipdir=scnterm-windows-$TAG_NAME
     if [[ "$BUILD_REASON" == "Schedule" ]] ; then
       zipname=WezTerm-windows-nightly.zip
       instname=WezTerm-nightly-setup
@@ -192,20 +192,20 @@ Release: ${SPEC_RELEASE}
 Packager: Wez Furlong <wez@wezfurlong.org>
 License: MIT
 URL: https://wezterm.org/
-Summary: Wez's Terminal Emulator.
+Summary: scnterm Terminal Emulator.
 ${BUILD_REQUIRES}
 Requires: wezterm-common, wezterm-gui, wezterm-mux-server
 
 %global debug_package %{nil}
 
 %description
-wezterm is a terminal emulator with support for modern features
+scnterm is a terminal emulator with support for modern features
 such as fonts with ligatures, hyperlinks, tabs and multiple
 windows.
 
 # Subpackage: wezterm-common
 %package -n wezterm-common
-Summary: Wez's Terminal Emulator - Common CLI components
+Summary: scnterm Terminal Emulator - Common CLI components
 Requires: openssl
 %description -n wezterm-common
 wezterm-common provides the base CLI launcher and utilities shared by
@@ -213,7 +213,7 @@ all wezterm components.
 
 # Subpackage: wezterm-gui
 %package -n wezterm-gui
-Summary: Wez's Terminal Emulator - GUI and multiplexer
+Summary: scnterm Terminal Emulator - GUI and multiplexer
 Requires: wezterm-common
 %if 0%{?suse_version}
 Requires: dbus-1, fontconfig, libxcb1, libxkbcommon0, libxkbcommon-x11-0, libwayland-client0, libwayland-egl1, libwayland-cursor0, Mesa-libEGL1, libxcb-keysyms1, libxcb-ewmh2, libxcb-icccm4
@@ -227,7 +227,7 @@ tabs and multiple windows.
 
 # Subpackage: wezterm-mux-server
 %package -n wezterm-mux-server
-Summary: Wez's Terminal Emulator - Multiplexer server (headless)
+Summary: scnterm Terminal Emulator - Multiplexer server (headless)
 Requires: openssl
 %description -n wezterm-mux-server
 wezterm-mux-server is a headless terminal multiplexer that can be used
@@ -308,8 +308,8 @@ Maintainer: Wez Furlong <wez@wezfurlong.org>
 Section: utils
 Priority: optional
 Homepage: https://wezterm.org/
-Description: Wez's Terminal Emulator.
- wezterm is a terminal emulator with support for modern features
+Description: scnterm Terminal Emulator.
+ scnterm is a terminal emulator with support for modern features
  such as fonts with ligatures, hyperlinks, tabs and multiple
  windows.
 Provides: x-terminal-emulator
@@ -376,8 +376,8 @@ EOF
           $SUDO apt-get install ./$debname.deb
         fi
 
-        mv pkg/debian pkg/wezterm
-        tar cJf $debname.tar.xz -C pkg wezterm
+        mv pkg/debian pkg/scnterm
+        tar cJf $debname.tar.xz -C pkg scnterm
         rm -rf pkg
       ;;
     esac

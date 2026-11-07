@@ -56,7 +56,7 @@ class OpenInWezTermAction(GObject.GObject, Nautilus.MenuProvider):
             self._open_terminal(path)
 
     def _make_item(self, name, paths):
-        item = Nautilus.MenuItem(name=name, label='Open in WezTerm',
+        item = Nautilus.MenuItem(name=name, label='Open in scnterm',
             icon='org.wezfurlong.wezterm')
         item.connect('activate', self._menu_item_activated, paths)
         return item

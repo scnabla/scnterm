@@ -18,7 +18,10 @@ fi
 
 rm -f ${TAR_NAME}*
 
-NAME_PREFIX=wezterm-${TAG_NAME}
+NAME_PREFIX=scnterm-${TAG_NAME}
+if test -n "${COPR_SRPM}" ; then
+  NAME_PREFIX=wezterm-${TAG_NAME}
+fi
 
 git archive --prefix=${NAME_PREFIX}/ -o ${TAR_NAME} HEAD
 

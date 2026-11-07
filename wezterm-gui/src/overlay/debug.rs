@@ -192,7 +192,7 @@ pub fn show_debug_overlay(
 
     term.render(&[Change::Text(format!(
         "Debug Overlay\r\n\
-         wezterm version: {version} {triple}\r\n\
+         scnterm version: {version} {triple}\r\n\
          Window Environment: {connection_info}\r\n\
          Lua Version: {lua_version}\r\n\
          {opengl_info}\r\n\

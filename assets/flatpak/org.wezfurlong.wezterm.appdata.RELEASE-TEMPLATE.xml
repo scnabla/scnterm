@@ -4,11 +4,11 @@
   <id>org.wezfurlong.wezterm</id>
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
-  <name>WezTerm</name>
+  <name>scnterm</name>
   <summary>Powerful terminal and multiplexer</summary>
   <description>
     <p>
-      WezTerm is a terminal emulator with support for modern features such as
+      scnterm is a terminal emulator with support for modern features such as
       fonts with ligatures, hyperlinks, multiple windows, tabs and split panes.
     </p>
 

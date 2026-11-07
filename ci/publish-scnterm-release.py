@@ -120,7 +120,7 @@ def publish(root):
         f'- 构建平台：{", ".join(platforms)}\n'
         f'- [构建与测试记录]({run_url})\n'
         '- 文件校验值见 `SHA256SUMS`，构建信息见 `build-info.json`。\n\n'
-        '安装包及可执行文件沿用 WezTerm 名称。此页面持续更新为最新通过构建和测试的版本。\n'
+        '可执行文件和配置接口沿用 WezTerm 命名。此页面持续更新为最新通过构建和测试的版本。\n'
     )
     gh('api', '--method', 'PATCH', f'{endpoint}/releases/{release_id}', payload={
         'tag_name': TAG, 'target_commitish': commit, 'name': 'scnterm',

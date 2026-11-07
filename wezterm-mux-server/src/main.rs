@@ -16,7 +16,9 @@ mod daemonize;
 
 #[derive(Debug, Parser)]
 #[command(
-    about = "Wez's Terminal Emulator\nhttp://github.com/wezterm/wezterm",
+    name = "scnterm-mux-server",
+    bin_name = "wezterm-mux-server",
+    about = "scnterm — 基于 WezTerm 的终端模拟器\nhttps://github.com/scnabla/scnterm",
     version = config::wezterm_version(),
     trailing_var_arg = true,
 )]

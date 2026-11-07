@@ -835,7 +835,7 @@ impl FontConfigInner {
                     // their primary font (we can't know for sure)
                     format!(
                         "Unable to load a font matching one of your font_rules: {}. \
-                        Note that wezterm will synthesize font_rules to select bold \
+                        Note that scnterm will synthesize font_rules to select bold \
                         and italic fonts based on your primary font configuration",
                         attr
                     )

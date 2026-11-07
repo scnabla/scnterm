@@ -4,6 +4,8 @@ scnterm 是基于 [WezTerm](https://github.com/wezterm/wezterm) 的个人维护�
 
 项目基于官方提交 `e68a8ec27727fbbda15e07f0a0737cd5e16481f6` 开发，已完成 Linux x86_64 构建和基础运行验证。应用原有名称显示位置使用 `scnterm`；关闭确认框支持左右方向键选择、Enter 确认，默认选中“否”，保留 Y、N、Esc 和鼠标操作。首次构建与测试结果见 [开发环境](docs/development-environment.md)。
 
+Lua 配置可通过 `wezterm.app_name` 读取当前应用显示名称，用于自定义窗口标题。
+
 ## 项目文档
 
 - [开发与维护步骤](docs/README.md)：项目约定、功能开发、上游同步和发布流程。

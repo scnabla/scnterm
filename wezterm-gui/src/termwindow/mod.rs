@@ -566,7 +566,7 @@ impl TermWindow {
         match RenderState::new(ctx, &self.fonts, &self.render_metrics, ATLAS_SIZE) {
             Ok(render_state) => {
                 log::debug!(
-                    "OpenGL initialized! {} wezterm version: {}",
+                    "OpenGL initialized! {} scnterm version: {}",
                     render_info,
                     config::wezterm_version(),
                 );
