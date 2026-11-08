@@ -203,6 +203,8 @@ pub struct LocalDomain {
     pty_system: Mutex<Box<dyn PtySystem + Send>>,
     id: DomainId,
     name: String,
+    // scnterm: 保存后续串口连接的日志开关和端口名，不与已有窗格共享状态。
+    serial_settings: Mutex<Option<SerialDomain>>,
 }
 
 impl LocalDomain {
@@ -232,6 +234,7 @@ impl LocalDomain {
             pty_system: Mutex::new(pty_system),
             id,
             name: name.to_string(),
+            serial_settings: Mutex::new(None),
         }
     }
 
@@ -246,7 +249,10 @@ impl LocalDomain {
     pub fn new_serial_domain(serial_domain: SerialDomain) -> anyhow::Result<Self> {
         let serial = serial_domain.serial_tty()?;
         let pty_system = Box::new(serial);
-        Ok(Self::with_pty_system(&serial_domain.name, pty_system))
+        let domain = Self::with_pty_system(&serial_domain.name, pty_system);
+        // scnterm: 将连接配置交给独立日志模块，设备驱动不依赖日志和 GUI。
+        *domain.serial_settings.lock() = Some(serial_domain);
+        Ok(domain)
     }
 
     fn is_serial(&self) -> bool {
@@ -273,6 +279,8 @@ impl LocalDomain {
             serial_domain.name
         );
         *pty_system = Box::new(serial);
+        // scnterm: 配置重载只影响下次连接，已有日志控制器继续使用原参数。
+        *self.serial_settings.lock() = Some(serial_domain.clone());
         Ok(())
     }
 
@@ -662,16 +670,32 @@ impl Domain for LocalDomain {
             terminal.enable_conpty_quirks();
         }
 
-        let pane: Arc<dyn Pane> = match child_result {
-            Ok(child) => Arc::new(LocalPane::new(
+        // scnterm: 只给串口附加日志；队列先就绪，再由 mux 启动接收线程。
+        let serial_log = self.serial_settings.lock().as_ref().map(|settings| {
+            let log = crate::serial_log::SerialLog::new(
                 pane_id,
-                terminal,
-                child,
-                pair.master,
-                Box::new(writer),
-                self.id,
-                command_description,
-            )),
+                settings.port.as_ref().unwrap_or(&settings.name).clone(),
+            );
+            if settings.log_on_connect {
+                if let Err(error) = log.start(config::configuration().serial_logging.clone()) {
+                    log::error!("无法开始串口日志：{error:#}");
+                }
+            }
+            log
+        });
+        let pane: Arc<dyn Pane> = match child_result {
+            Ok(child) => Arc::new(
+                LocalPane::new(
+                    pane_id,
+                    terminal,
+                    child,
+                    pair.master,
+                    Box::new(writer),
+                    self.id,
+                    command_description,
+                )
+                .with_serial_log(serial_log),
+            ),
             Err(err) => {
                 // Show the error to the user in the new pane
                 write!(writer, "{err:#}").ok();

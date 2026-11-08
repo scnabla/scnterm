@@ -1288,6 +1288,15 @@ impl TermWindow {
                 }
                 MuxNotification::PaneOutput(pane_id) => {
                     self.mux_pane_output_event(pane_id);
+                    // scnterm: 日志状态变化复用窗格通知，错误不写入设备输出。
+                    if self.window_contains_pane(pane_id) {
+                        if let Some(pane) = Mux::get().get_pane(pane_id) {
+                            if pane.serial_log().is_some() {
+                                crate::serial_logging::notify_error(Some(&*pane));
+                                self.update_title();
+                            }
+                        }
+                    }
                 }
                 MuxNotification::WindowInvalidated(_) => {
                     window.invalidate();
@@ -1989,6 +1998,16 @@ impl TermWindow {
             None => false,
         };
 
+        // scnterm: 由 serial_logging 合成日志状态与用户 Lua 状态，并传入标签栏背景信息。
+        // 胶囊圆弧外侧跟随窗口焦点及标签栏样式，不修改用户保存的原状态文字。
+        let serial_pane = self.get_active_pane_no_overlay();
+        crate::serial_logging::notify_error(serial_pane.as_deref());
+        let right_status = crate::serial_logging::right_status(
+            serial_pane.as_deref(),
+            &self.right_status,
+            &self.config,
+            self.focused.is_some(),
+        );
         let new_tab_bar = TabBarState::new(
             self.dimensions.pixel_width / self.render_metrics.cell_size.width as usize,
             if hovering_in_tab_bar {
@@ -2001,7 +2020,7 @@ impl TermWindow {
             self.config.resolved_palette.tab_bar.as_ref(),
             &self.config,
             &self.left_status,
-            &self.right_status,
+            &right_status,
         );
         if new_tab_bar != self.tab_bar {
             self.tab_bar = new_tab_bar;
@@ -2778,6 +2797,9 @@ impl TermWindow {
             ScrollToBottom => self.scroll_to_bottom(pane),
             ShowTabNavigator => self.show_tab_navigator(),
             ShowDebugOverlay => self.show_debug_overlay(),
+            // scnterm: 动作仅转发给目标窗格的日志模块，磁盘处理在后台执行。
+            StartSerialLogging => crate::serial_logging::perform(&**pane, true)?,
+            StopSerialLogging => crate::serial_logging::perform(&**pane, false)?,
             ShowLauncher => self.show_launcher(),
             ShowLauncherArgs(args) => {
                 let title = args.title.clone().unwrap_or("Launcher".to_string());

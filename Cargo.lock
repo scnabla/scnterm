@@ -3610,6 +3610,7 @@ dependencies = [
  "textwrap",
  "thiserror 2.0.20",
  "url",
+ "vtparse",
  "wezterm-dynamic",
  "wezterm-ssh",
  "wezterm-term",

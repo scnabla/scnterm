@@ -35,6 +35,8 @@ pub mod lua;
 pub mod meta;
 mod scheme_data;
 mod serial;
+// scnterm: 独立管理串口日志配置，供连接与日志模块共用。
+mod serial_logging;
 mod ssh;
 mod terminal;
 mod tls;
@@ -55,6 +57,7 @@ pub use font::*;
 pub use frontend::*;
 pub use keys::*;
 pub use serial::*;
+pub use serial_logging::*;
 pub use ssh::*;
 pub use terminal::*;
 pub use tls::*;

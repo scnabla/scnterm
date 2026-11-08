@@ -583,6 +583,9 @@ pub enum KeyAssignment {
     SplitVertical(SpawnCommand),
     ShowLauncher,
     ShowLauncherArgs(LauncherActionArgs),
+    // scnterm: 串口日志动作供菜单与 Lua 共用，不设置全局默认快捷键。
+    StartSerialLogging,
+    StopSerialLogging,
     ClearScrollback(ScrollbackEraseMode),
     Search(Pattern),
     ActivateCopyMode,

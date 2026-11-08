@@ -40,6 +40,8 @@ pub mod domain;
 pub mod localpane;
 pub mod pane;
 pub mod renderable;
+// scnterm: 独立串口日志模块，复用接收数据，不改变终端解析和发送流程。
+pub mod serial_log;
 pub mod ssh;
 pub mod ssh_agent;
 pub mod tab;
@@ -291,8 +293,9 @@ fn read_from_pane_pty(
     // or in the main mux thread.  If `true`, this thread will terminate.
     let dead = Arc::new(AtomicBool::new(false));
 
-    let (pane_id, exit_behavior) = match pane.upgrade() {
-        Some(pane) => (pane.pane_id(), pane.exit_behavior()),
+    // scnterm: 在终端解析前复制接收数据，生命周期由 serial_log 模块管理。
+    let (pane_id, exit_behavior, serial_log) = match pane.upgrade() {
+        Some(pane) => (pane.pane_id(), pane.exit_behavior(), pane.serial_log()),
         None => return,
     };
 
@@ -334,6 +337,10 @@ fn read_from_pane_pty(
                 break;
             }
             Ok(size) => {
+                // scnterm: 接收时采集时间；队列超限或写入失败不影响终端输出。
+                if let Some(log) = &serial_log {
+                    log.receive(&buf[..size], chrono::Local::now());
+                }
                 histogram!("read_from_pane_pty.bytes.rate").record(size as f64);
                 log::trace!("read_pty pane {pane_id} read {size} bytes");
                 // Send received data to this pane parser thread.
@@ -348,6 +355,10 @@ fn read_from_pane_pty(
         }
     }
 
+    // scnterm: EOF 和读错误均结束本次记录，后台写完已接收的内容。
+    if let Some(log) = serial_log {
+        log.close();
+    }
     match exit_behavior.unwrap_or_else(|| configuration().exit_behavior) {
         ExitBehavior::Hold | ExitBehavior::CloseOnCleanExit => {
             // We don't know if we can unilaterally close
@@ -760,6 +771,24 @@ impl Mux {
     }
 
     pub fn shutdown() {
+        // scnterm: GUI 事件循环结束后排空日志，避免退出时遗留后台待写内容。
+        if let Some(mux) = Self::try_get() {
+            let logs: Vec<_> = mux
+                .panes
+                .read()
+                .values()
+                .filter_map(|pane| pane.serial_log())
+                .collect();
+            for log in &logs {
+                log.close();
+            }
+            let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+            for log in logs {
+                if !log.wait_closed(deadline.saturating_duration_since(std::time::Instant::now())) {
+                    log::error!("退出时日志写入未在等待期限内完成");
+                }
+            }
+        }
         MUX.lock().take();
     }
 

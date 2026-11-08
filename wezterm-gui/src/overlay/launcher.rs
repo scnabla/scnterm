@@ -50,6 +50,8 @@ pub struct LauncherDomainEntry {
 }
 
 pub struct LauncherArgs {
+    // scnterm: 捕获原串口窗格的日志操作，避免菜单自身替换活动窗格。
+    serial_log_entry: Option<(String, KeyAssignment)>,
     flags: LauncherFlags,
     domains: Vec<LauncherDomainEntry>,
     tabs: Vec<LauncherTabEntry>,
@@ -154,6 +156,15 @@ impl LauncherArgs {
         };
 
         Self {
+            // scnterm: 仅在启动或连接菜单中加入日志操作，保留标签导航的条目和索引。
+            serial_log_entry: if flags
+                .intersects(LauncherFlags::LAUNCH_MENU_ITEMS | LauncherFlags::DOMAINS)
+            {
+                mux.get_pane(pane_id)
+                    .and_then(|pane| crate::serial_logging::menu_entry(&*pane))
+            } else {
+                None
+            },
             flags,
             domains,
             tabs,
@@ -228,6 +239,10 @@ impl LauncherState {
 
     fn build_entries(&mut self, args: LauncherArgs) {
         let config = configuration();
+        // scnterm: 日志操作作用于打开菜单时的串口窗格，不创建新连接。
+        if let Some((label, action)) = args.serial_log_entry {
+            self.entries.push(Entry { label, action });
+        }
         // Pull in the user defined entries from the launch_menu
         // section of the configuration.
         if args.flags.contains(LauncherFlags::LAUNCH_MENU_ITEMS) {

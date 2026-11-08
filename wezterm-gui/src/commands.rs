@@ -615,6 +615,8 @@ fn label_string(action: &KeyAssignment, candidate: String) -> String {
 /// but can also be used to describe user-provided commands
 pub fn derive_command_from_key_assignment(action: &KeyAssignment) -> Option<CommandDef> {
     Some(match action {
+        // scnterm: 串口动作说明由独立界面模块维护，其他命令定义不变。
+        StartSerialLogging | StopSerialLogging => return crate::serial_logging::command_def(action),
         PasteFrom(ClipboardPasteSource::PrimarySelection) => CommandDef {
             brief: "Paste primary selection".into(),
             doc: "Pastes text from the primary selection".into(),

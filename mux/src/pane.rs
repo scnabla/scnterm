@@ -172,6 +172,11 @@ impl LogicalLine {
 pub trait Pane: Downcast + Send + Sync {
     fn pane_id(&self) -> PaneId;
 
+    // scnterm: 日志状态只由串口窗格提供，其他连接保持原有行为。
+    fn serial_log(&self) -> Option<Arc<crate::serial_log::SerialLog>> {
+        None
+    }
+
     /// Returns the 0-based cursor position relative to the top left of
     /// the visible screen
     fn get_cursor_position(&self) -> StableCursorPosition;

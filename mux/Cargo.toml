@@ -44,6 +44,8 @@ termwiz-funcs.workspace = true
 termwiz.workspace = true
 textwrap.workspace = true
 thiserror.workspace = true
+# scnterm: 复用已有字节解析器处理日志中的终端控制指令。
+vtparse = { workspace = true, features = ["std"] }
 url.workspace = true
 wezterm-dynamic.workspace = true
 wezterm-ssh.workspace = true

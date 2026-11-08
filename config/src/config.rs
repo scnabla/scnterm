@@ -370,6 +370,10 @@ pub struct Config {
     #[dynamic(default)]
     pub serial_ports: Vec<SerialDomain>,
 
+    // scnterm: 日志公共设置与串口连接参数分离，定义见 serial_logging.rs。
+    #[dynamic(default)]
+    pub serial_logging: crate::SerialLogging,
+
     /// The set of unix domains
     #[dynamic(default = "UnixDomain::default_unix_domains")]
     pub unix_domains: Vec<UnixDomain>,
@@ -1333,6 +1337,9 @@ impl Config {
     /// on those provided by the user.  This is where we do that.
     pub fn compute_extra_defaults(&self, config_path: Option<&Path>) -> Self {
         let mut cfg = self.clone();
+
+        // scnterm: 日志目录相对于实际主配置解析，不依赖启动目录。
+        cfg.serial_logging.resolve_directory(config_path);
 
         // Convert any relative font dirs to their config file relative locations
         if let Some(config_dir) = config_path.as_ref().and_then(|p| p.parent()) {

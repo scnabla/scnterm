@@ -17,6 +17,8 @@ async fn async_run_serial(opts: SerialCommand) -> anyhow::Result<()> {
         parity: Some(opts.parity),
         stop_bits: Some(opts.stop_bits),
         flow_control: Some(opts.flow_control),
+        // scnterm: 直接命令行连接保持默认不记录，可从菜单手动开始。
+        log_on_connect: false,
     };
 
     let start_command = StartCommand {

@@ -74,6 +74,10 @@ pub struct SerialDomain {
 
     /// 流控：None、Software 或 Hardware。省略时保留原有软件流控。
     pub flow_control: Option<SerialFlowControl>,
+
+    // scnterm: 仅控制新连接是否自动记录；旧配置默认不启动日志。
+    #[dynamic(default)]
+    pub log_on_connect: bool,
 }
 
 fn validate_baud(value: &Option<usize>) -> Result<(), String> {

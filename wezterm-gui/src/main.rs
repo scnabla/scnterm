@@ -49,6 +49,8 @@ mod scripting;
 mod scrollbar;
 mod selection;
 mod serial;
+// scnterm: 串口日志交互集中在独立模块，沿用已有菜单和状态栏。
+mod serial_logging;
 mod shapecache;
 mod spawn;
 mod stats;

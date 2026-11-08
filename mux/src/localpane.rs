@@ -133,12 +133,18 @@ pub struct LocalPane {
     #[cfg(unix)]
     leader: Arc<Mutex<Option<CachedLeaderInfo>>>,
     command_description: String,
+    // scnterm: 每个窗格独立持有日志控制器，具体逻辑见 serial_log 模块。
+    serial_log: Option<Arc<crate::serial_log::SerialLog>>,
 }
 
 #[async_trait(?Send)]
 impl Pane for LocalPane {
     fn pane_id(&self) -> PaneId {
         self.pane_id
+    }
+
+    fn serial_log(&self) -> Option<Arc<crate::serial_log::SerialLog>> {
+        self.serial_log.clone()
     }
 
     fn get_metadata(&self) -> Value {
@@ -241,6 +247,10 @@ impl Pane for LocalPane {
     }
 
     fn kill(&self) {
+        // scnterm: 窗格关闭先通知日志排空，不能让磁盘写入阻塞 GUI。
+        if let Some(log) = &self.serial_log {
+            log.close();
+        }
         let mut proc = self.process.lock();
         log::debug!(
             "killing process in pane {}, state is {:?}",
@@ -1036,7 +1046,14 @@ impl LocalPane {
             #[cfg(unix)]
             leader: Arc::new(Mutex::new(None)),
             command_description,
+            serial_log: None,
         }
+    }
+
+    // scnterm: 只在串口创建处附加日志，保留其他 LocalPane 调用接口。
+    pub fn with_serial_log(mut self, log: Option<Arc<crate::serial_log::SerialLog>>) -> Self {
+        self.serial_log = log;
+        self
     }
 
     #[cfg(unix)]
@@ -1153,6 +1170,10 @@ impl LocalPane {
 
 impl Drop for LocalPane {
     fn drop(&mut self) {
+        // scnterm: 创建失败或未经过显式关闭的窗格也必须释放日志任务。
+        if let Some(log) = &self.serial_log {
+            log.close();
+        }
         // Avoid lingering zombies if we can, but don't block forever.
         // <https://github.com/wezterm/wezterm/issues/558>
         if let ProcessState::Running { signaller, .. } = &mut *self.process.lock() {
