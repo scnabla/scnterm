@@ -244,13 +244,36 @@ impl LocalDomain {
     }
 
     pub fn new_serial_domain(serial_domain: SerialDomain) -> anyhow::Result<Self> {
-        let port = serial_domain.port.as_ref().unwrap_or(&serial_domain.name);
-        let mut serial = portable_pty::serial::SerialTty::new(&port);
-        if let Some(baud) = serial_domain.baud {
-            serial.set_baud_rate(baud as u32);
-        }
+        let serial = serial_domain.serial_tty()?;
         let pty_system = Box::new(serial);
         Ok(Self::with_pty_system(&serial_domain.name, pty_system))
+    }
+
+    fn is_serial(&self) -> bool {
+        let pty_system = self.pty_system.lock();
+        let pty_system: &dyn PtySystem = &**pty_system;
+        pty_system
+            .downcast_ref::<portable_pty::serial::SerialTty>()
+            .is_some()
+    }
+
+    /// 配置重载只更新后续连接的参数，不改变已经打开的设备。
+    pub fn update_serial_domain(&self, serial_domain: &SerialDomain) -> anyhow::Result<()> {
+        let serial = serial_domain.serial_tty()?;
+        let mut pty_system = self.pty_system.lock();
+        let is_serial = {
+            let pty_system: &dyn PtySystem = &**pty_system;
+            pty_system
+                .downcast_ref::<portable_pty::serial::SerialTty>()
+                .is_some()
+        };
+        anyhow::ensure!(
+            self.name == serial_domain.name && is_serial,
+            "连接名称 {:?} 已被其他类型的连接使用",
+            serial_domain.name
+        );
+        *pty_system = Box::new(serial);
+        Ok(())
     }
 
     #[cfg(unix)]
@@ -452,6 +475,12 @@ impl LocalDomain {
         command_dir: Option<String>,
         pane_id: PaneId,
     ) -> anyhow::Result<CommandBuilder> {
+        if self.is_serial() {
+            // 串口只连接设备，不继承本机的默认 Shell、启动目录和命令修正。
+            let cmd = command.unwrap_or_else(CommandBuilder::new_default_prog);
+            anyhow::ensure!(cmd.is_default_prog(), "串口连接不能启动本地程序");
+            return Ok(cmd);
+        }
         let config = configuration();
 
         let wsl = self.resolve_wsl_domain();
@@ -615,7 +644,11 @@ impl Domain for LocalDomain {
             },
             self.name
         );
-        let child_result = pair.slave.spawn_command(cmd);
+        let child_result = match pair.slave.spawn_command(cmd) {
+            // 串口写入会发送到设备，不能通过该通道输出本机启动错误。
+            Err(err) if self.is_serial() => return Err(err),
+            result => result,
+        };
         let mut writer = WriterWrapper::new(pair.master.take_writer()?);
 
         let mut terminal = wezterm_term::Terminal::new(

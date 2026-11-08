@@ -4,6 +4,9 @@ use config::{GuiPosition, SshParameters};
 use std::ffi::OsString;
 use std::path::PathBuf;
 
+mod serial;
+pub use serial::SerialCommand;
+
 pub const DEFAULT_WINDOW_CLASS: &str = "org.wezfurlong.wezterm";
 
 /// Helper for parsing config overrides
@@ -166,38 +169,6 @@ pub struct SshCommand {
     /// as if it were a login shell.
     #[arg(value_parser, value_hint=ValueHint::CommandWithArguments, num_args=1..)]
     pub prog: Vec<OsString>,
-}
-
-#[derive(Debug, Parser, Clone)]
-pub struct SerialCommand {
-    /// Set the baud rate.  The default is 9600 baud.
-    #[arg(long = "baud")]
-    pub baud: Option<usize>,
-
-    /// Override the default windowing system class.
-    /// The default is "org.wezfurlong.wezterm".
-    /// Under X11 and Windows this changes the window class.
-    /// Under Wayland this changes the app_id.
-    /// This changes the class for all windows spawned by this
-    /// instance of wezterm, including error, update and ssh
-    /// authentication dialogs.
-    #[arg(long = "class")]
-    pub class: Option<String>,
-    /// Override the position for the initial window launched by this process.
-    ///
-    /// --position 10,20          to set x=10, y=20 in screen coordinates
-    /// --position screen:10,20   to set x=10, y=20 in screen coordinates
-    /// --position main:10,20     to set x=10, y=20 relative to the main monitor
-    /// --position active:10,20   to set x=10, y=20 relative to the active monitor
-    /// --position HDMI-1:10,20   to set x=10, y=20 relative to the monitor named HDMI-1
-    #[arg(long, verbatim_doc_comment)]
-    pub position: Option<GuiPosition>,
-
-    /// Specifies the serial device name.
-    /// On Windows systems this can be a name like `COM0`.
-    /// On posix systems this will be something like `/dev/ttyUSB0`
-    #[arg(value_parser)]
-    pub port: String,
 }
 
 #[derive(Debug, Parser, Clone)]

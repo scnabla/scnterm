@@ -80,7 +80,11 @@ fn update_mux_domains_impl(config: &ConfigHandle, is_standalone_mux: bool) -> an
     }
 
     for serial in &config.serial_ports {
-        if mux.get_domain_by_name(&serial.name).is_some() {
+        if let Some(domain) = mux.get_domain_by_name(&serial.name) {
+            let local = domain.downcast_ref::<LocalDomain>().ok_or_else(|| {
+                anyhow::anyhow!("连接名称 {:?} 已被其他类型的连接使用", serial.name)
+            })?;
+            local.update_serial_domain(serial)?;
             continue;
         }
 

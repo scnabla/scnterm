@@ -224,17 +224,16 @@ impl Pane for LocalPane {
     }
 
     fn exit_behavior(&self) -> Option<ExitBehavior> {
-        // If we are ssh, and we've not yet fully connected,
-        // then override exit_behavior so that we can show
-        // connection issues
+        // SSH 连接失败和串口异常断开时保留窗格，以便查看错误与已有输出。
         let mut pty = self.pty.lock();
         let is_ssh_connecting = pty
             .downcast_mut::<crate::ssh::WrappedSshPty>()
             .map(|s| s.is_connecting())
             .unwrap_or(false);
         let is_failed_spawn = pty.is::<crate::domain::FailedSpawnPty>();
+        let is_serial = pty.is::<portable_pty::serial::SerialMaster>();
 
-        if is_ssh_connecting || is_failed_spawn {
+        if is_ssh_connecting || is_failed_spawn || is_serial {
             Some(ExitBehavior::CloseOnCleanExit)
         } else {
             None

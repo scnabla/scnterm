@@ -12,6 +12,7 @@ Lua 配置可通过 `wezterm.app_name` 读取当前应用显示名称，用于�
 - [Linux 开发环境](docs/development-environment.md)：依赖安装、构建命令、独立启动与测试结果。
 - [自动构建与发布](docs/continuous-release.md)：发布平台、兼容性检查和自动更新方式。
 - [待修复问题](docs/known-issues.md)：已记录的缺陷、排查方向和验收要求。
+- [功能待办](docs/todo.md)：待开发功能、实施顺序和验收要求。
 - [个人终端配置](https://github.com/scnabla/personal-config)：通过 Lua 配置实现的个人设置。
 - [WezTerm 官方文档](https://wezterm.org/)：已有终端功能、Lua 配置和命令行使用说明。
 

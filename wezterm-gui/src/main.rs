@@ -9,7 +9,7 @@ use anyhow::{anyhow, Context};
 use clap::builder::ValueParser;
 use clap::{Parser, ValueHint};
 use config::keyassignment::{SpawnCommand, SpawnTabDomain};
-use config::{ConfigHandle, SerialDomain, SshDomain, SshMultiplexing};
+use config::{ConfigHandle, SshDomain, SshMultiplexing};
 use mux::activity::Activity;
 use mux::domain::{Domain, LocalDomain};
 use mux::Mux;
@@ -48,6 +48,7 @@ mod resize_increment_calculator;
 mod scripting;
 mod scrollbar;
 mod selection;
+mod serial;
 mod shapecache;
 mod spawn;
 mod stats;
@@ -194,57 +195,6 @@ fn run_ssh(opts: SshCommand) -> anyhow::Result<()> {
 
     promise::spawn::spawn(async {
         if let Err(err) = async_run_ssh(opts).await {
-            terminate_with_error(err);
-        }
-    })
-    .detach();
-
-    maybe_show_configuration_error_window();
-    gui.run_forever()
-}
-
-async fn async_run_serial(opts: SerialCommand) -> anyhow::Result<()> {
-    let serial_domain = SerialDomain {
-        name: format!("Serial Port {}", opts.port),
-        port: Some(opts.port.clone()),
-        baud: opts.baud,
-    };
-
-    let start_command = StartCommand {
-        always_new_process: true,
-        class: opts.class,
-        cwd: None,
-        no_auto_connect: true,
-        position: opts.position,
-        workspace: None,
-        domain: Some(serial_domain.name.clone()),
-        ..Default::default()
-    };
-
-    let cmd = None;
-
-    let domain: Arc<dyn Domain> = Arc::new(LocalDomain::new_serial_domain(serial_domain)?);
-    let mux = Mux::get();
-    mux.add_domain(&domain);
-
-    let should_publish = false;
-    async_run_terminal_gui(cmd, start_command, should_publish).await
-}
-
-fn run_serial(config: config::ConfigHandle, opts: SerialCommand) -> anyhow::Result<()> {
-    if let Some(cls) = opts.class.as_ref() {
-        crate::set_window_class(cls);
-    }
-    if let Some(pos) = opts.position.as_ref() {
-        set_window_position(pos.clone());
-    }
-
-    build_initial_mux(&config, None, None)?;
-
-    let gui = crate::frontend::try_new()?;
-
-    promise::spawn::spawn(async {
-        if let Err(err) = async_run_serial(opts).await {
             terminate_with_error(err);
         }
     })
@@ -1257,7 +1207,7 @@ fn run() -> anyhow::Result<()> {
         }
         SubCommand::BlockingStart(_) => unreachable!(),
         SubCommand::Ssh(ssh) => run_ssh(ssh),
-        SubCommand::Serial(serial) => run_serial(config, serial),
+        SubCommand::Serial(serial) => serial::run(config, serial),
         SubCommand::Connect(connect) => run_terminal_gui(
             StartCommand {
                 domain: Some(connect.domain_name.clone()),
