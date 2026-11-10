@@ -374,6 +374,10 @@ pub struct Config {
     #[dynamic(default)]
     pub serial_logging: crate::SerialLogging,
 
+    // scnterm: 公共串口着色规则，加载时校验；不改变设备输出及日志。
+    #[dynamic(default)]
+    pub serial_highlighting: crate::SerialHighlighting,
+
     /// The set of unix domains
     #[dynamic(default = "UnixDomain::default_unix_domains")]
     pub unix_domains: Vec<UnixDomain>,

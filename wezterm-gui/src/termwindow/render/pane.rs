@@ -311,6 +311,15 @@ impl crate::TermWindow {
             pos.pane
                 .apply_hyperlinks(stable_range.clone(), &self.config.hyperlink_rules);
 
+            // scnterm: 独立高亮模块返回绘制副本，保持终端内容、复制和日志不变。
+            // 非串口或无规则时仍走上游行读取；搜索覆盖层保留原有高亮。
+            let highlighted_lines = self.serial_highlight_cache.visible_lines(
+                &*pos.pane,
+                stable_range.clone(),
+                &self.config.serial_highlighting,
+                self.config.generation(),
+            );
+
             struct LineRender<'a, 'b> {
                 term_window: &'a mut crate::TermWindow,
                 selrange: Option<SelectionRange>,
@@ -565,7 +574,13 @@ impl crate::TermWindow {
                 }
             }
 
-            pos.pane.with_lines_mut(stable_range.clone(), &mut render);
+            // scnterm: 将串口副本交给原有绘制流程，继续复用选区、光标和缓存。
+            if let Some((first, mut lines)) = highlighted_lines {
+                let mut refs: Vec<_> = lines.iter_mut().collect();
+                render.with_lines_mut(first, &mut refs);
+            } else {
+                pos.pane.with_lines_mut(stable_range.clone(), &mut render);
+            }
             if let Some(error) = render.error.take() {
                 return Err(error).context("error while calling with_lines_mut");
             }

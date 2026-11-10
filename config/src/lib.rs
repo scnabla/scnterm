@@ -37,6 +37,8 @@ mod scheme_data;
 mod serial;
 // scnterm: 独立管理串口日志配置，供连接与日志模块共用。
 mod serial_logging;
+// scnterm: 串口高亮配置与规则编译独立于日志和设备通信。
+mod serial_highlighting;
 mod ssh;
 mod terminal;
 mod tls;
@@ -58,6 +60,8 @@ pub use frontend::*;
 pub use keys::*;
 pub use serial::*;
 pub use serial_logging::*;
+// scnterm: 对外提供已校验的高亮规则，显示模块不重复编译。
+pub use serial_highlighting::*;
 pub use ssh::*;
 pub use terminal::*;
 pub use tls::*;

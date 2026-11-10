@@ -29,6 +29,8 @@ notify.workspace = true
 ordered-float = { workspace=true, features = ["serde"] }
 portable-pty = { workspace=true, features = ["serde_support"]}
 promise.workspace = true
+# scnterm: 串口高亮在加载配置时编译规则，复用工作区正则依赖。
+regex.workspace = true
 serde = {workspace=true, features = ["rc", "derive"]}
 serde_json.workspace = true
 shlex.workspace = true

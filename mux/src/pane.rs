@@ -172,6 +172,12 @@ impl LogicalLine {
 pub trait Pane: Downcast + Send + Sync {
     fn pane_id(&self) -> PaneId;
 
+    // scnterm: 为独立串口显示扩展提供连接类型，不依赖日志是否开启。
+    // 其他窗格和搜索覆盖层保持原有绘制行为。
+    fn is_serial(&self) -> bool {
+        false
+    }
+
     // scnterm: 日志状态只由串口窗格提供，其他连接保持原有行为。
     fn serial_log(&self) -> Option<Arc<crate::serial_log::SerialLog>> {
         None

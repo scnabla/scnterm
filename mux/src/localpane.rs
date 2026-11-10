@@ -143,6 +143,11 @@ impl Pane for LocalPane {
         self.pane_id
     }
 
+    // scnterm: 串口高亮仅识别实际串口 PTY，日志状态不影响连接类型。
+    fn is_serial(&self) -> bool {
+        self.pty.lock().is::<portable_pty::serial::SerialMaster>()
+    }
+
     fn serial_log(&self) -> Option<Arc<crate::serial_log::SerialLog>> {
         self.serial_log.clone()
     }

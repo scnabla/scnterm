@@ -435,6 +435,9 @@ pub struct TermWindow {
 
     line_quad_cache: RefCell<LfuCache<LineQuadCacheKey, LineQuadCacheValue>>,
 
+    // scnterm: 按窗口缓存串口匹配结果，独立模块限制容量并处理配置重载。
+    serial_highlight_cache: crate::serial_highlighting::SerialHighlightCache,
+
     last_status_call: Instant,
     cursor_blink_state: RefCell<ColorEase>,
     blink_state: RefCell<ColorEase>,
@@ -746,6 +749,8 @@ impl TermWindow {
                 &config,
             )),
             next_line_state_id: 0,
+            // scnterm: 高亮缓存不持有设备或日志资源。
+            serial_highlight_cache: Default::default(),
             line_quad_cache: RefCell::new(LfuCache::new(
                 "line_quad_cache.hit.rate",
                 "line_quad_cache.miss.rate",
