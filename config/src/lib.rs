@@ -26,6 +26,8 @@ mod cell;
 mod color;
 mod config;
 mod daemon;
+// scnterm: SSH 目录记录文件的配置解析独立于菜单和文件读写。
+mod directory_menu;
 mod exec_domain;
 mod font;
 mod frontend;

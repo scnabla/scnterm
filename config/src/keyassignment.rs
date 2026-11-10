@@ -586,6 +586,8 @@ pub enum KeyAssignment {
     // scnterm: 串口日志动作供菜单与 Lua 共用，不设置全局默认快捷键。
     StartSerialLogging,
     StopSerialLogging,
+    // scnterm: SSH 常用目录由独立 directory_menu 模块处理，供主 Lua 绑定快捷键。
+    ShowDirectoryMenu,
     ClearScrollback(ScrollbackEraseMode),
     Search(Pattern),
     ActivateCopyMode,

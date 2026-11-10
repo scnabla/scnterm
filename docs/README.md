@@ -20,6 +20,8 @@ Linux 构建环境、命令及验证记录见 [开发环境](development-environ
 
 已记录的缺陷及后续验收要求见 [待修复问题](known-issues.md)。
 
+SSH 路径收藏、菜单操作与快捷键见 [SSH 常用目录](directory-menu.md)。
+
 待开发功能及实施顺序见 [功能待办](todo.md)。
 
 ## 第一阶段 搭建开发环境

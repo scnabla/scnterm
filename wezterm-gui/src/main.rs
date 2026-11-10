@@ -38,6 +38,8 @@ mod colorease;
 mod commands;
 mod customglyph;
 mod download;
+// scnterm: SSH 常用目录的菜单与本地保存独立于上游连接实现。
+mod directory_menu;
 mod frontend;
 mod glyphcache;
 mod inputmap;

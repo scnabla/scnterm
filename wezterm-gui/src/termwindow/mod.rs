@@ -2325,6 +2325,27 @@ impl TermWindow {
         promise::spawn::spawn(future).detach();
     }
 
+    // scnterm: 目录菜单复用覆盖层的后台线程和退出清理，原始 SSH 窗格继续接收输出。
+    // 路径查询、菜单和文件操作集中在 directory_menu，不阻塞 GUI 线程。
+    fn show_directory_menu(&mut self) {
+        let mux = Mux::get();
+        // scnterm: 每次打开读取当前配置；已打开的菜单保持原文件，避免中途切换记录。
+        let bookmarks_file = self.config.directory_bookmarks_file.clone().unwrap_or_else(|| {
+            config::HOME_DIR.join(".config/wezterm/scnterm-directory-bookmarks.json")
+        });
+        if let (Some(tab), Some(pane)) = (
+            mux.get_active_tab_for_window(self.mux_window_id),
+            self.get_active_pane_no_overlay(),
+        ) {
+            let domain = mux.get_domain(pane.domain_id());
+            let (overlay, future) = start_overlay(self, &tab, move |_, term| {
+                crate::directory_menu::run(term, pane, domain, bookmarks_file)
+            });
+            self.assign_overlay(tab.tab_id(), overlay);
+            promise::spawn::spawn(future).detach();
+        }
+    }
+
     fn show_prompt_input_line(&mut self, args: &PromptInputLine) {
         let mux = Mux::get();
         let tab = match mux.get_active_tab_for_window(self.mux_window_id) {
@@ -2805,6 +2826,8 @@ impl TermWindow {
             // scnterm: 动作仅转发给目标窗格的日志模块，磁盘处理在后台执行。
             StartSerialLogging => crate::serial_logging::perform(&**pane, true)?,
             StopSerialLogging => crate::serial_logging::perform(&**pane, false)?,
+            // scnterm: 保持动作分发简短，目录菜单使用独立后台覆盖层。
+            ShowDirectoryMenu => self.show_directory_menu(),
             ShowLauncher => self.show_launcher(),
             ShowLauncherArgs(args) => {
                 let title = args.title.clone().unwrap_or("Launcher".to_string());

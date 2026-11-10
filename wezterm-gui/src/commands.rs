@@ -617,6 +617,15 @@ pub fn derive_command_from_key_assignment(action: &KeyAssignment) -> Option<Comm
     Some(match action {
         // scnterm: 串口动作说明由独立界面模块维护，其他命令定义不变。
         StartSerialLogging | StopSerialLogging => return crate::serial_logging::command_def(action),
+        // scnterm: 目录菜单动作接入现有命令面板，具体行为见 directory_menu。
+        ShowDirectoryMenu => CommandDef {
+            brief: "常用目录".into(),
+            doc: "管理当前 SSH 连接的常用目录".into(),
+            keys: vec![],
+            args: &[ArgType::ActivePane],
+            menubar: &[],
+            icon: None,
+        },
         PasteFrom(ClipboardPasteSource::PrimarySelection) => CommandDef {
             brief: "Paste primary selection".into(),
             doc: "Pastes text from the primary selection".into(),

@@ -385,6 +385,10 @@ pub struct Config {
     #[dynamic(default)]
     pub ssh_domains: Option<Vec<SshDomain>>,
 
+    // scnterm: SSH 目录菜单的保存位置，校验及路径解析见 directory_menu.rs。
+    #[dynamic(default, validate = "crate::directory_menu::validate_file")]
+    pub directory_bookmarks_file: Option<PathBuf>,
+
     #[dynamic(default)]
     pub ssh_backend: SshBackend,
 
@@ -1344,6 +1348,12 @@ impl Config {
 
         // scnterm: 日志目录相对于实际主配置解析，不依赖启动目录。
         cfg.serial_logging.resolve_directory(config_path);
+
+        // scnterm: 目录记录默认与主 Lua 同目录，相对路径也在加载时按主 Lua 解析。
+        cfg.directory_bookmarks_file = Some(crate::directory_menu::resolve_file(
+            self.directory_bookmarks_file.as_deref(),
+            config_path,
+        ));
 
         // Convert any relative font dirs to their config file relative locations
         if let Some(config_dir) = config_path.as_ref().and_then(|p| p.parent()) {
