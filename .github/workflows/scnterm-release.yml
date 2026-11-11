@@ -308,98 +308,6 @@ jobs:
           retention-days: 5
           if-no-files-found: "error"
 
-  macos:
-    if: github.repository == 'scnabla/scnterm' && github.ref == 'refs/heads/personal'
-    name: macos
-    needs: validate
-    runs-on: "macos-15-intel"
-    timeout-minutes: 120
-    env:
-      BUILD_REASON: "Schedule"
-      CARGO_INCREMENTAL: "0"
-      SCCACHE_GHA_ENABLED: "true"
-      RUSTC_WRAPPER: "sccache"
-      MACOSX_DEPLOYMENT_TARGET: "10.12"
-      CARGO_BUILD_JOBS: "3"
-
-    steps:
-      - name: "checkout repo"
-        uses: actions/checkout@v5
-        with:
-          submodules: "recursive"
-          persist-credentials: false
-      - name: "Install Rust (ARM)"
-        shell: bash
-        run: "rustup target add aarch64-apple-darwin"
-      - name: "Install Rust (Intel)"
-        shell: bash
-        run: "rustup target add x86_64-apple-darwin"
-      - name: "Compile with sccache"
-        uses: mozilla-actions/sccache-action@v0.0.9
-      - name: "Cache Rust Dependencies"
-        uses: actions/cache@v4
-        id: cache-cargo-vendor
-        with:
-          path: |
-            vendor
-            .cargo/config
-          key: "scnterm-macos-${{ hashFiles('**/Cargo.lock') }}"
-      - name: "Vendor dependencies"
-        if: steps.cache-cargo-vendor.outputs.cache-hit != 'true'
-        shell: bash
-        run: "cargo vendor --locked --versioned-dirs >> .cargo/config"
-      - name: "Install System Deps"
-        shell: bash
-        run: "env CI=yes PATH=$PATH ./get-deps"
-      - name: "Build wezterm (Release mode Intel)"
-        shell: bash
-        run: "cargo build --locked --target x86_64-apple-darwin -p wezterm --release"
-      - name: "Build wezterm (Release mode ARM)"
-        shell: bash
-        run: "cargo build --locked --target aarch64-apple-darwin -p wezterm --release"
-      - name: "Build wezterm-gui (Release mode Intel)"
-        shell: bash
-        run: "cargo build --locked --target x86_64-apple-darwin -p wezterm-gui --release"
-      - name: "Build wezterm-gui (Release mode ARM)"
-        shell: bash
-        run: "cargo build --locked --target aarch64-apple-darwin -p wezterm-gui --release"
-      - name: "Build wezterm-mux-server (Release mode Intel)"
-        shell: bash
-        run: "cargo build --locked --target x86_64-apple-darwin -p wezterm-mux-server --release"
-      - name: "Build wezterm-mux-server (Release mode ARM)"
-        shell: bash
-        run: "cargo build --locked --target aarch64-apple-darwin -p wezterm-mux-server --release"
-      - name: "Build strip-ansi-escapes (Release mode Intel)"
-        shell: bash
-        run: "cargo build --locked --target x86_64-apple-darwin -p strip-ansi-escapes --release"
-      - name: "Build strip-ansi-escapes (Release mode ARM)"
-        shell: bash
-        run: "cargo build --locked --target aarch64-apple-darwin -p strip-ansi-escapes --release"
-      - name: "Install cargo-nextest from Cargo"
-        uses: baptiste0928/cargo-install@v3
-        with:
-          crate: "cargo-nextest"
-          cache-key: "macos"
-      - name: "Test"
-        shell: bash
-        run: "cargo nextest run --locked --all --no-fail-fast --target=x86_64-apple-darwin"
-      - name: "Test wezterm-escape-parser (no_std)"
-        shell: bash
-        run: "cargo nextest run --locked -p wezterm-escape-parser --target=x86_64-apple-darwin"
-      - name: "Package"
-        shell: bash
-        run: "bash ci/deploy.sh"
-      - name: "整理下载文件"
-        shell: bash
-        run: "python3 ci/prepare-release-assets.py macos"
-      - name: "Upload artifact"
-        uses: actions/upload-artifact@v7
-        with:
-          name: "macos"
-          path: "release-assets/*"
-          retention-days: 5
-          if-no-files-found: "error"
-
   windows:
     if: github.repository == 'scnabla/scnterm' && github.ref == 'refs/heads/personal'
     name: windows
@@ -484,7 +392,7 @@ jobs:
 
   publish:
     name: 更新 Release
-    needs: [ubuntu22_04, ubuntu24_04, ubuntu26_04, macos, windows]
+    needs: [ubuntu22_04, ubuntu24_04, ubuntu26_04, windows]
     if: github.repository == 'scnabla/scnterm' && github.ref == 'refs/heads/personal'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -503,5 +411,5 @@ jobs:
       - name: 校验产物并更新固定 Release
         env:
           GH_TOKEN: ${{ github.token }}
-          EXPECTED_PLATFORMS: ubuntu26.04,macos,windows
+          EXPECTED_PLATFORMS: ubuntu26.04,windows
         run: python3 ci/publish-scnterm-release.py release-artifacts

@@ -10,11 +10,10 @@
 | Ubuntu 26.04 | x86_64 | 编译、测试、打包并发布 |
 | Ubuntu 22.04 | x86_64 | 编译与测试 |
 | Ubuntu 24.04 | x86_64 | 编译与测试 |
-| macOS | x86_64、aarch64 | 编译、测试并发布通用安装包，测试沿用上游的 x86_64 目标 |
 
-各平台复用 `ci/generate-workflows.py` 中的上游构建步骤。五个平台全部成功后，发布任务收集 Windows、Ubuntu 26.04 与 macOS 的产物。
+各平台复用 `ci/generate-workflows.py` 中的上游构建步骤。四个构建任务全部成功后，发布任务收集 Windows 与 Ubuntu 26.04 的产物。
 
-macOS 任务使用 GitHub 的 `macos-15-intel` 标准构建机器，编译 Intel 和 Apple Silicon 两个目标并生成通用包，自动测试在 Intel 目标上运行。
+macOS 不参与当前自动编译、测试和发布，也不作为 Release 更新的前置条件。
 
 编译检查验证平台代码能否编译、链接，自动测试验证已有测试覆盖的功能。窗口显示、输入法、字体和快捷键等桌面行为需要对应系统的实机验证。
 
@@ -26,7 +25,6 @@ macOS 任务使用 GitHub 的 `macos-15-intel` 标准构建机器，编译 Intel
 | --- | --- |
 | `scnterm-windows-x64.zip` | Windows 便携包 |
 | `scnterm-windows-x64-setup.exe` | Windows 安装程序 |
-| `scnterm-macos-universal.zip` | macOS Intel 与 Apple Silicon 通用包 |
 | `scnterm-ubuntu26.04-amd64.deb` | Ubuntu 26.04 安装包 |
 | `scnterm-ubuntu26.04-amd64.tar.xz` | Ubuntu 26.04 文件归档 |
 | `scnterm-ubuntu26.04-x64.AppImage` | Linux AppImage |
@@ -35,14 +33,14 @@ macOS 任务使用 GitHub 的 `macos-15-intel` 标准构建机器，编译 Intel
 | `SHA256SUMS` | 安装包与构建信息的 SHA-256 校验值 |
 | `build-info.json` | 源码提交、发布平台和工作流运行地址 |
 
-下载文件、解压后的外层目录和 macOS 应用包使用 scnterm 名称。命令名称、系统安装包标识以及配置路径沿用 WezTerm。应用标识与安装路径的调整按独立任务处理。
+下载文件和解压后的外层目录使用 scnterm 名称。命令名称、系统安装包标识以及配置路径沿用 WezTerm。应用标识与安装路径的调整按独立任务处理。
 
 `latest` 标签跟随成功发布的个人分支提交更新；其他继承自上游的历史标签继续保留。
 
 ## 发布条件
 
 - 构建和测试任务只有仓库读取权限，发布任务使用 `GITHUB_TOKEN` 的仓库内容写入权限。
-- 构建或测试失败时，发布任务不运行，已有 Release 不变。
+- 必需的构建或测试任务失败、被取消时，发布任务不运行，已有 Release 不变。源码推送成功不表示下载包已更新，可通过 `build-info.json` 的 `commit` 字段核对包内源码版本。
 - 发布前检查所需平台的产物是否齐全、是否为空，上传后核对文件大小和远程提供的校验值。
 - 发布任务串行执行，避免同时修改同一个 Release。
 - 发布前比较构建提交与 `personal` 最新提交。已有更新提交时，跳过旧提交的发布。
@@ -56,7 +54,7 @@ GitHub 附件逐个上传，已有 Release 的附件替换不是一次性完成�
 编辑 `ci/generate-scnterm-workflow.py`：
 
 ```python
-ENABLED_PLATFORMS = ('ubuntu26.04', 'macos', 'windows')
+ENABLED_PLATFORMS = ('ubuntu26.04', 'windows')
 CHECK_ONLY_PLATFORMS = ('ubuntu22.04', 'ubuntu24.04')
 ```
 
@@ -74,7 +72,7 @@ git diff --check
 
 将生成器和 `.github/workflows/scnterm-release.yml` 一起提交并推送到 `personal`。日常功能修改不需要重新生成工作流。
 
-发布 macOS 安装包时，当前流程不使用 Apple 签名和公证凭据。
+若重新启用 macOS，生成器使用 `macos-15-intel` 构建 Intel 和 Apple Silicon 通用包，测试运行于 Intel 目标，不使用 Apple 签名和公证凭据。
 
 ## 手动重跑与上游同步
 

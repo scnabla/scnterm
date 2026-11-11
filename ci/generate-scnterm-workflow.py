@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / '.github/workflows/scnterm-release.yml'
-ENABLED_PLATFORMS = ('ubuntu26.04', 'macos', 'windows')
+ENABLED_PLATFORMS = ('ubuntu26.04', 'windows')
 CHECK_ONLY_PLATFORMS = ('ubuntu22.04', 'ubuntu24.04')
 SPEC = importlib.util.spec_from_file_location('upstream_workflows', ROOT / 'ci/generate-workflows.py')
 upstream = importlib.util.module_from_spec(SPEC)
