@@ -90,10 +90,8 @@ jobs:
       - run: python3 -B ci/generate-scnterm-workflow.py
       - run: git diff --exit-code -- .github/workflows/scnterm-release.yml
 ''')
-        names = []
         for target in targets:
             name = target.name.replace('.', '_')
-            names.append(name)
             job = build_job(target, target.name in ENABLED_PLATFORMS)
             f.write(f'  {name}:\n')
             f.write("    if: github.repository == 'scnabla/scnterm' && github.ref == 'refs/heads/personal'\n")
@@ -108,11 +106,13 @@ jobs:
                 f.write(f'      {key}: {upstream.yv(value)}\n')
             job.render(f, 3)
             f.write('\n')
-        f.write('  publish:\n')
-        f.write('    name: 更新 Release\n')
-        f.write('    needs: [' + ', '.join(names) + ']\n')
-        f.write("    if: github.repository == 'scnabla/scnterm' && github.ref == 'refs/heads/personal'\n")
-        f.write('''    runs-on: ubuntu-latest
+        for platform in ENABLED_PLATFORMS:
+            name = platform.replace('.', '_')
+            f.write(f'  publish_{name}:\n')
+            f.write(f'    name: 更新 {platform} Release\n')
+            f.write(f'    needs: {name}\n')
+            f.write("    if: github.repository == 'scnabla/scnterm' && github.ref == 'refs/heads/personal'\n")
+            f.write('''    runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: write
@@ -125,13 +125,17 @@ jobs:
           persist-credentials: false
       - uses: actions/download-artifact@v8
         with:
-          path: release-artifacts
-      - name: 校验产物并更新固定 Release
+''')
+            f.write(f'          name: {platform}\n')
+            f.write(f'          path: release-artifacts/{platform}\n')
+            f.write('''      - name: 校验产物并更新该平台的 Release 附件
         env:
           GH_TOKEN: ${{ github.token }}
 ''')
-        f.write('          EXPECTED_PLATFORMS: ' + ','.join(ENABLED_PLATFORMS) + '\n')
-        f.write('        run: python3 ci/publish-scnterm-release.py release-artifacts\n')
+            f.write(f'          EXPECTED_PLATFORMS: {platform}\n')
+            f.write('          RELEASE_PLATFORMS: ' + ','.join(ENABLED_PLATFORMS) + '\n')
+            f.write('        run: python3 ci/publish-scnterm-release.py release-artifacts\n')
+
 
 
 if __name__ == '__main__':

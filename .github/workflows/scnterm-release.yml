@@ -390,9 +390,9 @@ jobs:
           retention-days: 5
           if-no-files-found: "error"
 
-  publish:
-    name: 更新 Release
-    needs: [ubuntu22_04, ubuntu24_04, ubuntu26_04, windows]
+  publish_ubuntu26_04:
+    name: 更新 ubuntu26.04 Release
+    needs: ubuntu26_04
     if: github.repository == 'scnabla/scnterm' && github.ref == 'refs/heads/personal'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -407,9 +407,36 @@ jobs:
           persist-credentials: false
       - uses: actions/download-artifact@v8
         with:
-          path: release-artifacts
-      - name: 校验产物并更新固定 Release
+          name: ubuntu26.04
+          path: release-artifacts/ubuntu26.04
+      - name: 校验产物并更新该平台的 Release 附件
         env:
           GH_TOKEN: ${{ github.token }}
-          EXPECTED_PLATFORMS: ubuntu26.04,windows
+          EXPECTED_PLATFORMS: ubuntu26.04
+          RELEASE_PLATFORMS: ubuntu26.04,windows
+        run: python3 ci/publish-scnterm-release.py release-artifacts
+  publish_windows:
+    name: 更新 windows Release
+    needs: windows
+    if: github.repository == 'scnabla/scnterm' && github.ref == 'refs/heads/personal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    concurrency:
+      group: scnterm-release-publish
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: windows
+          path: release-artifacts/windows
+      - name: 校验产物并更新该平台的 Release 附件
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_PLATFORMS: windows
+          RELEASE_PLATFORMS: ubuntu26.04,windows
         run: python3 ci/publish-scnterm-release.py release-artifacts

@@ -11,7 +11,7 @@
 | Ubuntu 22.04 | x86_64 | 编译与测试 |
 | Ubuntu 24.04 | x86_64 | 编译与测试 |
 
-各平台复用 `ci/generate-workflows.py` 中的上游构建步骤。四个构建任务全部成功后，发布任务收集 Windows 与 Ubuntu 26.04 的产物。
+各平台复用 `ci/generate-workflows.py` 中的上游构建步骤。Windows 与 Ubuntu 26.04 各自在自身编译、测试和打包成功后更新对应附件，不等待其他平台。Ubuntu 22.04、24.04 仅做兼容性检查，其失败或取消不阻挡 Windows 和 Ubuntu 26.04 发布。
 
 macOS 不参与当前自动编译、测试和发布，也不作为 Release 更新的前置条件。
 
@@ -19,7 +19,7 @@ macOS 不参与当前自动编译、测试和发布，也不作为 Release 更�
 
 ## 固定下载入口
 
-[scnterm 下载](https://github.com/scnabla/scnterm/releases/tag/latest) 使用标题为 `scnterm`、标签为 `latest` 的同一个 Release，每次发布替换安装包、更新提交编号及说明。
+[scnterm 下载](https://github.com/scnabla/scnterm/releases/tag/latest) 使用标题为 `scnterm`、标签为 `latest` 的同一个 Release，每次平台发布只替换该平台的安装包，并更新对应版本信息及说明。其他启用平台的安装包继续保留。
 
 | 文件 | 用途 |
 | --- | --- |
@@ -29,20 +29,21 @@ macOS 不参与当前自动编译、测试和发布，也不作为 Release 更�
 | `scnterm-ubuntu26.04-amd64.tar.xz` | Ubuntu 26.04 文件归档 |
 | `scnterm-ubuntu26.04-x64.AppImage` | Linux AppImage |
 | `scnterm-ubuntu26.04-x64.AppImage.zsync` | AppImage 更新所需的校验数据 |
-| `scnterm-src.tar.gz` | 包含上游脚本所收集子模块的源码包 |
+| `scnterm-src.tar.gz` | 随 Ubuntu 26.04 更新的源码包，包含上游脚本收集的子模块 |
 | `SHA256SUMS` | 安装包与构建信息的 SHA-256 校验值 |
-| `build-info.json` | 源码提交、发布平台和工作流运行地址 |
+| `build-info.json` | 各平台的源码提交、工作流运行地址及安装包校验值 |
 
 下载文件和解压后的外层目录使用 scnterm 名称。命令名称、系统安装包标识以及配置路径沿用 WezTerm。应用标识与安装路径的调整按独立任务处理。
 
-`latest` 标签跟随成功发布的个人分支提交更新；其他继承自上游的历史标签继续保留。
+`latest` 标签和 `build-info.json` 顶层的 `commit`、`run_url` 表示最近一次平台发布更新。不同平台可以对应不同源码提交，应通过 `platform_builds.<平台名>.commit` 核对具体安装包的版本。Release 说明也按平台列出提交和构建记录。其他继承自上游的历史标签继续保留。
 
 ## 发布条件
 
 - 构建和测试任务只有仓库读取权限，发布任务使用 `GITHUB_TOKEN` 的仓库内容写入权限。
-- 必需的构建或测试任务失败、被取消时，发布任务不运行，已有 Release 不变。源码推送成功不表示下载包已更新，可通过 `build-info.json` 的 `commit` 字段核对包内源码版本。
-- 发布前检查所需平台的产物是否齐全、是否为空，上传后核对文件大小和远程提供的校验值。
-- 发布任务串行执行，避免同时修改同一个 Release。
+- 某个平台构建、测试或打包失败、被取消时，只跳过该平台的发布，其上一版安装包保留；其他成功平台独立更新。源码推送成功不表示各个平台下载包都已更新。
+- 发布任务只下载自身平台的产物，检查是否齐全、是否为空；上传后核对文件大小和远程校验值。
+- 更新构建信息和 `SHA256SUMS` 时合并其他启用平台的原有版本与校验值，不把未更新的平台标成新提交。原有信息缺失或不匹配时停止发布。
+- 各平台发布任务共用串行执行组，避免同时修改同一个 Release 的版本信息和校验文件；构建任务仍并行运行。
 - 发布前比较构建提交与 `personal` 最新提交。已有更新提交时，跳过旧提交的发布。
 - 同一个 Release 的同名附件会被替换，已取消发布的平台附件在成功上传新产物后清理。
 - 第一次发布先建立草稿，产物校验完成后公开。后续更新沿用已有 Release。
