@@ -29,3 +29,9 @@
 ## 发布验证
 
 Linux 本地检查通过后合入 `personal`。Windows 与 Ubuntu 的完整构建、测试和打包由现有线上流程执行，各平台仅在自身检查成功后更新 Release。最终发布版本和 Windows 交付结果在流程完成后补充。
+
+### Windows 构建环境修正
+
+首次线上构建使用自动更新的 Rust 1.100.0。编译 `mux` 时，`sccache` 启动 `rustc` 的参数过长，返回 `The filename or extension is too long. (os error 206)`。日志中的依赖路径使用 Rust 1.100 的逐项产物目录，错误发生于编译器进程启动阶段。
+
+Windows 构建工具链固定为运行器原有的 Rust 1.99.1，保留原有编译缓存、测试和打包步骤。配置修改位于个人工作流生成器，不修改上游生成器。后续升级 Windows 工具链时需完成完整构建验证。

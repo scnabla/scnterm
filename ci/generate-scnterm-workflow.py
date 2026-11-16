@@ -36,6 +36,10 @@ def build_job(target, publish):
         job.env['SCNTERM_APPIMAGE_NAME'] = 'scnterm-ubuntu26.04-x64.AppImage'
     steps = []
     for step in job.steps:
+        # Rust 1.100 的产物路径使 Windows sccache 调用超过命令行长度限制。
+        # 固定已使用的 1.99.1，升级工具链时须重新验证完整 Windows 构建。
+        if target.name == 'windows' and isinstance(step, upstream.ActionStep) and step.action.startswith('dtolnay/rust-toolchain@'):
+            step.action = 'dtolnay/rust-toolchain@1.99.1'
         if isinstance(step, upstream.RunStep):
             if step.name == 'Workaround git permissions issue':
                 step.run = 'git config --global --add safe.directory "$GITHUB_WORKSPACE"'
