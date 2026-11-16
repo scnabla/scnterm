@@ -24,6 +24,10 @@ SSH 路径收藏、菜单操作与快捷键见 [SSH 常用目录](directory-menu
 
 待开发功能及实施顺序见 [功能待办](todo.md)。
 
+串口配置的独立 Windows 编辑器见 [scnterm-config](https://github.com/scnabla/scnterm-config)。该项目单独维护代码、构建和发布，主配置、SSH 与快捷键保持只读。
+
+2026-11-17 的上游更新和配置程序开发记录见 [推进计划](update-and-config-plan.md) 与 [2026-11-17 上游同步](upstream-update-20261117.md)。
+
 ## 第一阶段 搭建开发环境
 
 阶段目标：取得官方源码，配置构建工具，完成一次未经功能修改的构建，并在目标系统启动运行。
