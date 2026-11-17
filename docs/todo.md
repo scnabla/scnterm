@@ -137,7 +137,7 @@
 
 | 项目 | 内容 |
 | --- | --- |
-| 状态 | 首阶段独立 Windows 配置程序已实现 |
+| 状态 | 串口、SSH 与快捷键独立编辑已实现 |
 | 记录日期 | 2026-11-17 |
 | 目标 | 独立读取和编辑 ScnTerm 的 Lua 配置，减少手动填写，同时保护原有代码与注释 |
 
@@ -188,8 +188,14 @@
 
 使用方式、配置示例与开发验证记录维护在独立项目的 [README](https://github.com/scnabla/personal-config/blob/main/tools/scnterm-config/README.md) 和 [开发说明](https://github.com/scnabla/personal-config/blob/main/tools/scnterm-config/docs/development.md)。
 
+### 后续扩展实现
+
+配置程序位于 `personal-config/tools/scnterm-config/`。串口设置显示实际采用的值，大小写由各规则独立选择“是 / 否”，关键词与正则空输入框提供灰色格式参考。
+
+`ssh.lua` 与 `keys.lua` 各自提供编辑页面，支持多服务器增删改、快捷键增删及常用动作选择。每个文件单独预览、备份、保存和恢复，主 Lua 及其他文件只读。开发与验证详情维护在配置程序的开发说明中。
+
 ### 后续范围
 
 - 根据实际配置补充更多可明确识别的 Lua 写法。
-- SSH、快捷键和主配置的写入能力仍需单独确定，当前保持只读。
+- 主配置的写入能力仍需单独确定，当前保持只读。
 - 完整配置运行检查可作为后续独立选项评估，普通读取不执行 Lua。
