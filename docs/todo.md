@@ -182,11 +182,11 @@
 
 ### 首阶段实现
 
-独立项目为 [scnabla/scnterm-config](https://github.com/scnabla/scnterm-config)，本地目录为同级 `scnterm-config/`。Windows 独立窗口使用 Python/Tkinter，Lua 使用 Tree-sitter 静态解析，正则由独立 Rust 小程序检查，不引用 ScnTerm 的源码、crate 或构建目录。
+独立工具位于 [personal-config/tools/scnterm-config](https://github.com/scnabla/personal-config/tree/main/tools/scnterm-config)，本地目录为 `/home/scnable/work/config/personal-config/tools/scnterm-config/`。Windows 独立窗口使用 Python/Tkinter，Lua 使用 Tree-sitter 静态解析，正则由独立 Rust 小程序检查，不引用 ScnTerm 的源码、crate 或构建目录。
 
 已实现串口连接增删改、日志公共设置、关键词与正则颜色组、只读文件预览、差异确认、保存前备份、受限恢复和外部修改检测。支持直接配置表及现有 `M.apply(config)` 的局部串口表写法；动态表达式保持只读。备份保存在配置目录的 `.scnterm-config-backups/`，不自动清理。
 
-使用方式、配置示例与开发验证记录维护在独立项目的 [README](https://github.com/scnabla/scnterm-config/blob/main/README.md) 和 [开发说明](https://github.com/scnabla/scnterm-config/blob/main/docs/development.md)。
+使用方式、配置示例与开发验证记录维护在独立项目的 [README](https://github.com/scnabla/personal-config/blob/main/tools/scnterm-config/README.md) 和 [开发说明](https://github.com/scnabla/personal-config/blob/main/tools/scnterm-config/docs/development.md)。
 
 ### 后续范围
 

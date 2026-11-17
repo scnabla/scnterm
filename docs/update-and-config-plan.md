@@ -2,7 +2,7 @@
 
 ## 目标与范围
 
-同步 WezTerm 上游更新，验证后发布新版 ScnTerm；随后开发独立 Windows 配置程序。配置程序保存在同级 `scnterm-config` 项目目录，独立管理源码、依赖、测试、构建和发布。只允许编辑串口连接、日志和高亮配置，其他配置只读。具体文件保护要求见 [TODO-003](todo.md#todo-003-独立-lua-配置程序)。
+同步 WezTerm 上游更新，验证后发布新版 ScnTerm；随后开发独立 Windows 配置程序。配置程序保存在 `personal-config` 仓库的 `tools/scnterm-config/` 目录，独立管理源码、依赖、测试、构建和发布。只允许编辑串口连接、日志和高亮配置，其他配置只读。具体文件保护要求见 [TODO-003](todo.md#todo-003-独立-lua-配置程序)。
 
 ## 执行步骤
 
@@ -25,7 +25,7 @@
 
 - 上游冲突处理、Linux 构建及本地回归通过，详见 [上游同步记录](upstream-update-20261117.md)。
 - `main` 已快进至上游 `e1eae81a5`，个人分支完成合并，并修正 Windows 工具链自动升级引起的构建问题。
-- 独立配置项目 [scnterm-config](https://github.com/scnabla/scnterm-config) 已完成首阶段功能、43 项自动测试、Windows 独立桌面验证和线上发布。
+- 独立配置项目 [scnterm-config](https://github.com/scnabla/personal-config/tree/main/tools/scnterm-config) 已完成首阶段功能、43 项自动测试、Windows 独立桌面验证和线上发布。
 - 配置程序已交付至 Windows 的 `D:\成果物\scnterm-config`，包含串口参数、日志和高亮编辑，其他配置只读。
 - Ubuntu 22.04、24.04、26.04 的线上构建与完整测试通过；26.04 新包已发布，下载校验及命令行配置加载通过。
 - Windows 终端构建、测试、打包和发布通过，361 项测试通过，39 项上游限定平台的 SSH/SFTP 测试跳过。线上包完成默认 PowerShell、分屏、焦点切换和关闭验证后，交付至 `D:\成果物\scnterm`。

@@ -24,7 +24,7 @@ SSH 路径收藏、菜单操作与快捷键见 [SSH 常用目录](directory-menu
 
 待开发功能及实施顺序见 [功能待办](todo.md)。
 
-串口配置的独立 Windows 编辑器见 [scnterm-config](https://github.com/scnabla/scnterm-config)。该项目单独维护代码、构建和发布，主配置、SSH 与快捷键保持只读。
+串口配置的独立 Windows 编辑器见 [scnterm-config](https://github.com/scnabla/personal-config/tree/main/tools/scnterm-config)。该工具在 `personal-config/tools/scnterm-config/` 中单独维护代码、构建和发布，主配置、SSH 与快捷键保持只读。
 
 2026-11-17 的上游更新和配置程序开发记录见 [推进计划](update-and-config-plan.md) 与 [2026-11-17 上游同步](upstream-update-20261117.md)。
 
